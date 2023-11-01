@@ -1,2 +1,7 @@
 # chroniclock
-Implementation of Seqlock and Reader-Writers lock with priority.
+
+C++ implementation of Seqlock with benchmarks.
+
+TO-DO:
+
+DONE:
