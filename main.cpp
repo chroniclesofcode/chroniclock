@@ -4,11 +4,25 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <iostream>
+#include <thread>
 
 #include "chroniclock/seqlock.hpp"
 
-BOOST_AUTO_TEST_CASE(test) {
-    std::cout << "Hello wurld!\n";
+BOOST_AUTO_TEST_CASE(basic_test) {
+    int data = 30;
+    chroniclock::seqlock<int> s;
+    s.store(data);
+    auto func = [&s]() {
+        int tmp = 0;
+        while (true) {
+            if (s.load(tmp) && tmp == 100) {
+                return;
+            }
+        }
+    };
+    std::thread thread1(func);
+    s.store(100);
+    thread1.join(); // test passes if thread1 doesn't run forever
 }
 
 int main(int argc, char **argv) {
