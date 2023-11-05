@@ -13,6 +13,14 @@ readers and few writers.
 
 Note: type T used must be trivially copy-assignable.
 
+# Benchmarking
+
+We will benchmark the amount of time it takes for N reads to occur within M threads.
+This is happening while another thread is constantly updating/writing new data within
+the seqlock.
+
+# Checklist
+
 TO-DO:
 - Implement Seqlock
 - Implement Read-Writers Lock/Queue

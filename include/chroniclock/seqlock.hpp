@@ -20,7 +20,6 @@ public:
         const uint32_t currv = version.load(std::memory_order_acquire);
         // if odd, write in progress
         if (currv & 1) return false;
-
         std::memcpy(&val, &data, sizeof(T));
         return currv == version;
     }
