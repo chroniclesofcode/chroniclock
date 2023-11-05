@@ -19,13 +19,18 @@ We will benchmark the amount of time it takes for N reads to occur within M thre
 This is happening while another thread is constantly updating/writing new data within
 the seqlock.
 
+Note: I have also benchmarked against Erik Rigtorp's implementation of a Seqlock.
+I have also taken some inspiration from his code, and benchmarked with/without
+padding that is meant to reduce the chances of false sharing. From my tests however,
+the padding doesn't seem to make much of an impact.
+
 # Checklist
 
-TO-DO:
+TO DO:
+
+DONE:
 - Implement Seqlock
 - Implement Read-Writers Lock/Queue
 - Implement Tests
 - Benchmark padding vs no padding
 - Benchmark in general
-
-DONE:

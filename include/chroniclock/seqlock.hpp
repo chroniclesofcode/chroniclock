@@ -24,9 +24,9 @@ public:
         return currv == version;
     }
 private:
-    alignas(128) std::atomic<uint32_t> version;
-    char _padding[128];
-    T data;
+    alignas(128) T data;
+    std::atomic<uint32_t> version;
+    char _padding[128 - (sizeof(version) + sizeof(T)) % 128];
 };
 
 

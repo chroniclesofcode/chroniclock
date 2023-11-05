@@ -1,16 +1,16 @@
 **** TIMES ****
 
-4863 milliseconds
-5239 milliseconds
-5896 milliseconds
-5057 milliseconds
-5415 milliseconds
+3850 milliseconds
+3769 milliseconds
+4198 milliseconds
+4456 milliseconds
+3711 milliseconds
 
 **** STATISTICS ****
 
 count: 5
-average: 5294 milliseconds
-variance: 124400 milliseconds^2
-standard deviation: 352.704 milliseconds
-min: 4863 milliseconds
-max: 5896 milliseconds
+average: 3996.8 milliseconds
+variance: 81294.2 milliseconds^2
+standard deviation: 285.121 milliseconds
+min: 3711 milliseconds
+max: 4456 milliseconds
