@@ -9,10 +9,12 @@
 #include <unistd.h>
 
 #include "chroniclock/seqlock.hpp"
+#include "chroniclock/rwlock.hpp"
 #include "chroniclock/Timer.h"
 #include "rigtorp/seqlock.hpp"
 
-#define STATS 1
+#define STATS 0
+#define RWTEST 1
 
 BOOST_AUTO_TEST_CASE(does_it_work) {
     int data = 50;
@@ -143,6 +145,110 @@ int main(int argc, char **argv) {
                 if (ct.load(std::memory_order_acquire) == 0) {
                     break;
                 }
+            }
+            for (auto &thr : threads) thr.join();
+            t.stop();
+            std::cout << "start: " << start << '\n';
+        }
+        t.printStats(); // Test complete, printing stats
+    }
+
+    if (RWTEST) {
+        Timer t("../stats/seqlock-spaced.txt");
+        //Timer t("../stats/seqlock_nopadding.txt");
+
+        struct Info {
+            int x, y, z;
+        };
+        
+        const int NTHREADS = 50;
+        const int NTESTS = 5;
+        #define AMOUNT (int)1e7
+
+        for (int nums = 0; nums < NTESTS; nums++) {
+            // Testing starts: initializing variables
+            chroniclock::seqlock<Info> s;
+            std::atomic<uint32_t> ct(0);
+            std::vector<std::thread> threads;
+
+            auto func = [&s, &ct]() {
+                while (ct.load(std::memory_order_acquire) == 0);
+                struct Info tmp;
+                for (int i = 0; i < AMOUNT; i++) {
+                    while (!s.load(tmp));
+                    assert(tmp.x == tmp.z/2 && tmp.y == tmp.x + tmp.z);
+                }
+                ct.fetch_sub(1, std::memory_order_release);
+            };
+
+            // Add function to NTHREADS threads, which will try to load
+            // 1e7 instances of struct Info
+            for (int i = 0; i < NTHREADS; i++) {
+                threads.push_back(std::thread(func));
+            }
+
+            int start = 10;
+            bool begin = false;
+            t.start();
+            // Will keep pushing Info until 1e7 has been read
+            while (true) {
+                struct Info tmp = { start/2, start/2 + start, start };
+                start++;
+                s.store(tmp);
+                if (!begin) {
+                    begin = true;
+                    ct.fetch_add(threads.size(), std::memory_order_release);
+                }
+                if (ct.load(std::memory_order_acquire) == 0) {
+                    break;
+                }
+                usleep(500);
+            }
+            for (auto &thr : threads) thr.join();
+            t.stop();
+            std::cout << "start: " << start << '\n';
+        }
+        t.printStats(); // Test complete, printing stats
+
+        t.reset("../stats/rwlock-spaced.txt");
+        for (int nums = 0; nums < NTESTS; nums++) {
+            // Testing starts: initializing variables
+            chroniclock::rwlock<Info> s;
+            std::atomic<uint32_t> ct(0);
+            std::vector<std::thread> threads;
+
+            auto func = [&s, &ct]() {
+                while (ct.load(std::memory_order_acquire) == 0);
+                struct Info tmp;
+                for (int i = 0; i < AMOUNT; i++) {
+                    s.load(tmp);
+                    assert(tmp.x == tmp.z/2 && tmp.y == tmp.x + tmp.z);
+                }
+                ct.fetch_sub(1, std::memory_order_release);
+            };
+
+            // Add function to NTHREADS threads, which will try to load
+            // 1e7 instances of struct Info
+            for (int i = 0; i < NTHREADS; i++) {
+                threads.push_back(std::thread(func));
+            }
+
+            int start = 10;
+            bool begin = false;
+            t.start();
+            // Will keep pushing Info until 1e7 has been read
+            while (true) {
+                struct Info tmp = { start/2, start/2 + start, start };
+                start++;
+                s.store(tmp);
+                if (!begin) {
+                    begin = true;
+                    ct.fetch_add(threads.size(), std::memory_order_release);
+                }
+                if (ct.load(std::memory_order_acquire) == 0) {
+                    break;
+                }
+                usleep(500);
             }
             for (auto &thr : threads) thr.join();
             t.stop();

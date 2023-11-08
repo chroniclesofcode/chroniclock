@@ -46,6 +46,7 @@ public:
         count = 0;
         small = 999999999;
         big = 0;
+        out << "**** TIMES ****\n\n";
     }
 
     void printStats() {

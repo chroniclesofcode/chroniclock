@@ -1,3 +1,5 @@
+**** TIMES ****
+
 3918 milliseconds
 3957 milliseconds
 4112 milliseconds

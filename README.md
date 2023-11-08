@@ -1,9 +1,8 @@
 # chroniclock
 
-C++ implementation of Seqlock with benchmarks. Compared and benchmark against
-a generic reader-writer lock with writer priority.
+C++ implementation of Seqlock with benchmarks. 
 
-A seqlock is also a reader-writer lock but it is aimed at pretty much
+A seqlock is a reader-writer lock but it is aimed at pretty much
 never starving writers. Readers will try to optimistically read the data, and
 if the data has changed since reading it, it will retry again (note: writers do
 not wait for readers).
@@ -24,13 +23,20 @@ I have also taken some inspiration from his code, and benchmarked with/without
 padding that is meant to reduce the chances of false sharing. From my tests however,
 the padding doesn't seem to make much of an impact.
 
+I also benchmarked against an implementation of a readers-writer lock with writer
+priority. Aka readers aren't allowed to read more if there's a waiting writer. It
+uses condition variables and mutexes for synchronisation. It is SIGNIFICANTLY
+slower - I would argue if you are able to use a Seqlock (e.g. your data is atomically
+readable), I would use it in almost every scenario. 
+
 # Checklist
 
 TO DO:
 
 DONE:
 - Implement Seqlock
-- Implement Read-Writers Lock/Queue
 - Implement Tests
 - Benchmark padding vs no padding
 - Benchmark in general
+- Implement Reader-Writers Lock
+- Benchmark Reader-Writers Lock
